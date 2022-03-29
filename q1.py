@@ -1,6 +1,8 @@
+# from numpy import log
 from math import log
-
 # encodes vector of 0's and 1's => indicatoing the words presence in the sentence
+
+
 def Encode(sent, wordls):
     returnls = []
     words = sent.split()[1:]
@@ -34,17 +36,19 @@ def Inference(TestSent, wordls, good_dict, bad_dict):
                 prob_bad += log(bad_dict[wordls[i]], 10)
             else:
                 # dos not contain word
-                prob_good += log(1 - good_dict[wordls[i]], 10)
-                prob_bad += log(1 - bad_dict[wordls[i]], 10)
+                prob_good += log((1 - good_dict[wordls[i]]), 10)
+                prob_bad += log((1 - bad_dict[wordls[i]]), 10)
         # add calculated probs to list
         inferences += [[prob_good, prob_bad]]
     return inferences
 
+# calcs prob P(good|x)
+
 
 def Calc_prob(inferences, good_prob, bad_prob):
     num = inferences[0] * good_prob
-    den = (inferences[0] * good_prob) + (inferences[1] + bad_prob)
-    ans = num / den
+    den = ((inferences[0] * good_prob) + (inferences[1] * bad_prob))
+    ans = (num / den)
     ans *= 100
     return round(ans, 2)
 
@@ -105,29 +109,34 @@ if __name__ == "__main__":
     for x, pg in good_dict.items():
         if pg == 0:
             good_dict[x] = ((pg * good) + k) / (good + (len(word_set) * k))
-            pb = bad_dict[x]
-            bad_dict[x] = ((pb * bad) + k) / (bad + (len(word_set) * k))
+        #pb = bad_dict[x]
+        #bad_dict[x] = ((pb * bad) + k) / (bad + (len(word_set) * k))
     # secondly loop the bad_dict
     for x, pb in bad_dict.items():
         if pb == 0:
             bad_dict[x] = ((pb * bad) + k) / (bad + (len(word_set) * k))
-            pg = good_dict[x]
-            good_dict[x] = ((pg * good) + k) / (good + (len(word_set) * k))
+        #pg = good_dict[x]
+        #good_dict[x] = ((pg * good) + k) / (good + (len(word_set) * k))
 
     # print class contiional model
     for i in word_set:
         print(
-            i + "\t" + str(round(good_dict[i], 4)) + "\t\t" + str(round(bad_dict[i], 4))
+            i + "\t\t\t" + str(round(good_dict[i], 4)) +
+            "\t\t" + str(round(bad_dict[i], 4))
         )
 
     TestData = [
-        "1 the service was great",
         "1 what a lovely restaurant",
         "1 the food the service and the restaurant was great",
-        "-1 the service is terrible",
-        "-1 the food tasted awful",
-        "-1 this is a bad restaurant",
+        "-1 we had a terrible experience",
+        "-1 the service and the food was terrible",
+        "-1 avoid the food",
+        "-1 the meal was terrible"
     ]
+
+    # TestData = [
+    #     "1 the restaurant was great",
+    #     "-1 the food was terrible"]
 
     print("\n")
     inferences = Inference(TestData, word_set, good_dict, bad_dict)
