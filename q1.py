@@ -39,7 +39,7 @@ def Inference(TestSent, wordls, good_dict, bad_dict):
                 prob_good += log((1 - good_dict[wordls[i]]), 10)
                 prob_bad += log((1 - bad_dict[wordls[i]]), 10)
         # add calculated probs to list
-        inferences += [[prob_good, prob_bad]]
+        inferences += [[10 ** prob_good, 10 ** prob_bad]]
     return inferences
 
 # calcs prob P(good|x)
